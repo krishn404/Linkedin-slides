@@ -179,16 +179,21 @@ export function useComponentPrinter() {
 
       // TODO Create buttons to download as png / svg / etc from 'html-to-image'
       const canvas = await toCanvas(html, options.htmlToImage).catch((err) => {
-        console.error(err);
+        console.error("Error creating canvas:", err);
+        return null;
       });
       if (!canvas) {
         console.error("Failed to create canvas");
         return;
       }
-      // DEBUG:
-      // document.body.appendChild(canvas);
-      const pdf = canvasToPdf(canvas, options);
-      pdf.save(options.filename);
+
+      // Ensure the PDF is created and saved correctly
+      try {
+        const pdf = canvasToPdf(canvas, options);
+        pdf.save(options.filename);
+      } catch (error) {
+        console.error("Error saving PDF:", error);
+      }
     },
   });
 
