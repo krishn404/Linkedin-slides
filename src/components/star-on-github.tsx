@@ -19,7 +19,7 @@ export function StarOnGithub() {
           "transition-all duration-300 ease-out"
         )}
         target="_blank"
-        href={"https://github.com/krishn404"}
+        href={"https://github.com/krishn404/Linkedin-slides"}
       >
         <span
           className={cn(
