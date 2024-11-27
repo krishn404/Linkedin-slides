@@ -162,7 +162,6 @@ export function useComponentPrinter() {
       }
 
       const SCALE_TO_LINKEDIN_INTRINSIC_SIZE = 1.8;
-      // const fontEmbedCss = await getFontEmbedCSS(html);
       const options: HtmlToPdfOptions = {
         margin: [0, 0, 0, 0],
         filename: watch("filename"),
@@ -170,29 +169,22 @@ export function useComponentPrinter() {
         htmlToImage: {
           height: SIZE.height * numPages,
           width: SIZE.width,
-          canvasHeight:
-            SIZE.height * numPages * SCALE_TO_LINKEDIN_INTRINSIC_SIZE,
+          canvasHeight: SIZE.height * numPages * SCALE_TO_LINKEDIN_INTRINSIC_SIZE,
           canvasWidth: SIZE.width * SCALE_TO_LINKEDIN_INTRINSIC_SIZE,
         },
         jsPDF: { unit: "px", format: [SIZE.width, SIZE.height] },
       };
 
-      // TODO Create buttons to download as png / svg / etc from 'html-to-image'
-      const canvas = await toCanvas(html, options.htmlToImage).catch((err) => {
-        console.error("Error creating canvas:", err);
-        return null;
-      });
-      if (!canvas) {
-        console.error("Failed to create canvas");
-        return;
-      }
-
-      // Ensure the PDF is created and saved correctly
       try {
+        const canvas = await toCanvas(html, options.htmlToImage);
+        if (!canvas) {
+          console.error("Failed to create canvas");
+          return;
+        }
         const pdf = canvasToPdf(canvas, options);
         pdf.save(options.filename);
       } catch (error) {
-        console.error("Error saving PDF:", error);
+        console.error("Error during PDF generation:", error);
       }
     },
   });
