@@ -3,8 +3,6 @@ import { useFormContext } from "react-hook-form";
 import { DocumentFormReturn } from "@/lib/document-form-types";
 import { Loader2Icon } from "lucide-react";
 import React, { useState } from "react";
-import { JsonExporter } from "./json-exporter";
-import { JsonImporter } from "./json-importer";
 import { FilenameForm } from "./forms/filename-form";
 import {
   Menubar,
@@ -49,53 +47,13 @@ export function EditorMenubar({}: {}) {
             {/* <MenubarItem > */}
             <FilenameForm className={"text-left my-1"} />
             {/* </MenubarItem> */}
-            <MenubarSeparator />
-            <JsonExporter
-              values={watch("config")}
-              filename={"carousel-settings.json"}
-            >
-              <MenubarItem>Export Settings</MenubarItem>
-            </JsonExporter>
-            <Dialog
-              open={isConfigDialogOpen}
-              onOpenChange={setIsConfigDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <MenubarItem onSelect={(e) => e.preventDefault()}>
-                  Import Settings
-                </MenubarItem>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Load a file with Settings</DialogTitle>
-                </DialogHeader>
 
-                <FileInputForm
-                  handleSubmit={(files) => {
-                    handleConfigFileSubmission(files);
-                    setIsConfigDialogOpen(false);
-                  }}
-                  label={"Settings File"}
-                  description="Select a json file to load"
-                />
-              </DialogContent>
-            </Dialog>
-            <MenubarSeparator />
-            <JsonExporter
-              values={watch("slides")}
-              filename={"carousel-content.json"}
-            >
-              <MenubarItem>Export Content</MenubarItem>
-            </JsonExporter>
+
             <Dialog
               open={isContentDialogOpen}
               onOpenChange={setIsContentDialogOpen}
             >
-              <DialogTrigger asChild>
-                <MenubarItem onSelect={(e) => e.preventDefault()}>
-                  Import Content
-                </MenubarItem>
-              </DialogTrigger>
+
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Load a file with content</DialogTitle>
