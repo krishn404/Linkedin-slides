@@ -121,7 +121,7 @@ export default function AboutPage() {
                   About AI Carousel Generator
                 </h1>
                 <p className="mx-auto max-w-[700px] text-[#00000099] md:text-xl">
-                  We're revolutionizing the way professionals create content for LinkedIn. Our AI-powered tool makes it easy to generate engaging carousels in minutes.
+                  We&apos;re revolutionizing the way professionals create content for LinkedIn. Our AI-powered tool makes it easy to generate engaging carousels in minutes.
                 </p>
               </div>
             </div>

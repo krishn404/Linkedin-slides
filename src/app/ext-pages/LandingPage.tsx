@@ -210,7 +210,7 @@ export default function LandingPage() {
                 <h3 className="text-xl font-semibold mb-4">One-Click LinkedIn Sharing</h3>
                 <p className="text-[#00000099] mb-6">
                   Seamlessly export your carousel and share it directly
-                  to LinkedIn with just one click. It's that simple!
+                  to LinkedIn with just one click. It&apos;s that simple!
                 </p>
               </div>
             </div>
