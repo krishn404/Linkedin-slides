@@ -8,8 +8,8 @@ export function NoApiKeysText() {
   return (
     <p className="text-center">
       Please enter your{" "}
-      <TypographyExternalLink href="https://openai.com/product">
-        OpenAI API key
+      <TypographyExternalLink href="https://gemini.com/product" className="gemini-typography">
+        Gemini API key
       </TypographyExternalLink>{" "}
       in
       <BringYourKeysDialog

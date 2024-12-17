@@ -58,7 +58,7 @@ function ApiKeyForm() {
   function onSubmit(data: z.infer<typeof FormSchema>) {
     setApiKey(data.key);
     toast({
-      title: "You've added your API key for this session",
+      title: "You've added your Gemini API key for this session",
     });
   }
 
@@ -73,11 +73,11 @@ function ApiKeyForm() {
           name="key"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>API KEY</FormLabel>
+              <FormLabel>GEMINI API KEY</FormLabel>
               <FormControl>
-                <Input placeholder="sk-****123" {...field} />
+                <Input placeholder="gm-****123" {...field} />
               </FormControl>
-              <FormDescription>This is your OpenAI API Key.</FormDescription>
+              <FormDescription>This is your Gemini API Key.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

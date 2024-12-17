@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFormContext } from "react-hook-form";
 import * as z from "zod";
+import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -49,14 +50,12 @@ export function AIInputForm() {
     setIsLoading(true);
     setStatus("loading");
 
-    const generatedSlides = await generateCarouselSlidesAction(
-      `A carousel with about "${data.prompt}"`
-    );
+    // Use Axios to fetch generated slides instead of langchain
+    const generatedSlides = await axios.post('/api/generate-carousel', {
+      prompt: `A carousel with about "${data.prompt}"`
+    }).then(response => response.data)
+      .catch(() => null);
 
-    // const generatedSlides = await generateCarouselSlides(
-    //   `A carousel with about "${data.prompt}"`,
-    //   apiKey
-    // );
     if (generatedSlides) {
       setValue("slides", generatedSlides);
       // TODO Fix toast not working
@@ -86,12 +85,12 @@ export function AIInputForm() {
               <FormLabel></FormLabel>
               <FormControl>
                 <div className="flex flex-row gap-2 items-center w-full">
-                  {/* <Input
+                  { <Input
                     placeholder="What's your carousel about"
                     {...field}
                     className="flex-1"
-                  /> */}
-                  {/* <Button type="submit" className="flex-0">
+                  /> }
+                  { <Button type="submit" className="flex-0">
                     {isLoading ? (
                       <LoadingSpinner />
                     ) : (
@@ -100,7 +99,7 @@ export function AIInputForm() {
                         <Sparkles className="w-4 h-4" /> Generate{" "}
                       </span>
                     )}
-                  </Button> */}
+                  </Button> }
                 </div>
               </FormControl>
               <FormMessage />

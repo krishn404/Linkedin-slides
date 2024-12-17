@@ -1,52 +1,104 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "edge"; // 'nodejs' is the default
+export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
   try {
-    let url = new URL(request.url);
-    let imageUrl = url.searchParams.get("url");
+    const url = new URL(request.url);
+    const imageUrl = url.searchParams.get("url");
 
     if (!imageUrl) {
-      return new NextResponse("URL Not provided", { status: 500 });
-    }
-    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "";
-
-    // Make a GET request to the external URL
-    const { contentType, body } = await fetchExternalImageUrl(imageUrl);
-
-    if (
-      !(typeof contentType === "string") ||
-      !contentType.startsWith("image")
-    ) {
-      return new NextResponse("Content type must be image", { status: 500 });
+      return new NextResponse(JSON.stringify({ 
+        error: "No URL provided", 
+        details: "Please include a valid image URL in the query parameter" 
+      }), { 
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
     }
 
-    const headers = new Headers();
-    headers.set("Access-Control-Allow-Origin", siteUrl);
-    headers.set("Content-Type", contentType);
-    // Return the response as-is
-    return new NextResponse(body, {
-      status: 200,
-      statusText: "OK",
-      headers,
-    });
+    try {
+      const { contentType, buffer } = await fetchExternalImageUrl(imageUrl);
+
+      const headers = new Headers();
+      headers.set("Access-Control-Allow-Origin", "*");
+      headers.set("Content-Type", contentType);
+      headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate");
+
+      return new NextResponse(buffer, {
+        status: 200,
+        headers,
+      });
+    } catch (fetchError) {
+      console.error("Image fetch error:", fetchError);
+      return new NextResponse(JSON.stringify({ 
+        error: "Failed to fetch image", 
+        details: fetchError instanceof Error ? fetchError.message : "Unknown error"
+      }), { 
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
   } catch (error) {
-    // Handle errors gracefully
-    console.error("Proxy error:", error);
-    return new NextResponse("Proxy error", {
+    console.error("Proxy route error:", error);
+    return new NextResponse(JSON.stringify({ 
+      error: "Internal proxy error", 
+      details: error instanceof Error ? error.message : "Unknown error"
+    }), { 
       status: 500,
-      headers: { "Content-Type": "text/plain" },
+      headers: { "Content-Type": "application/json" }
     });
   }
 }
 
 async function fetchExternalImageUrl(imageUrl: string) {
-  // TODO: Convert to server action
-  const response = await fetch(imageUrl);
-  const contentType = response.headers.get("Content-Type");
-  if (typeof contentType === "string" && contentType.startsWith("image")) {
-    response.body;
+  // Validate URL
+  try {
+    new URL(imageUrl);
+  } catch {
+    throw new Error("Invalid URL format");
   }
-  return { contentType, body: response.body };
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+
+  try {
+    const response = await fetch(imageUrl, {
+      method: 'GET',
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Next.js Image Proxy',
+        'Accept': 'image/*',
+      },
+      redirect: 'follow',
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const contentType = response.headers.get("Content-Type");
+    const contentLength = response.headers.get("Content-Length");
+
+    // Limit image size (e.g., 10MB)
+    if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
+      throw new Error("Image too large");
+    }
+
+    if (!contentType || !contentType.startsWith("image")) {
+      throw new Error("Invalid content type");
+    }
+
+    const buffer = await response.arrayBuffer();
+
+    return { 
+      contentType, 
+      buffer: Buffer.from(buffer)
+    };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
 }
